@@ -1,12 +1,14 @@
 """Interactive CLI for conversational research and validation with checkpoint persistence."""
 
 import asyncio
+import contextlib
 import os
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
 
+from langchain_core.runnables import RunnableConfig
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 
 from langgraph_audio_agents.agents.researcher import ResearcherAgent
@@ -42,7 +44,7 @@ def play_audio_sync(audio_data: bytes, format: str = "wav") -> None:
         (["ffplay", "-nodisp", "-autoexit"], "ffplay"),
     ]
 
-    for player_cmd, player_name in players:
+    for player_cmd, _player_name in players:
         try:
             with tempfile.NamedTemporaryFile(suffix=f".{format}", delete=False) as temp_file:
                 temp_file.write(audio_data)
@@ -61,10 +63,8 @@ def play_audio_sync(audio_data: bytes, format: str = "wav") -> None:
         except FileNotFoundError:
             continue
         except Exception:
-            try:
+            with contextlib.suppress(Exception):
                 os.unlink(temp_path)
-            except Exception:
-                pass
             continue
 
     print("⚠️  No audio player found. Install mpv or ffmpeg")
@@ -78,22 +78,26 @@ async def main() -> None:
 
     tavily = TavilySearch(settings.tavily)
 
+    from langgraph_audio_agents.domain.interfaces.audio_service import (
+        AudioService,
+    )
+
     if settings.tts_provider == "groq":
-        researcher_tts = GroqTTS(settings.groq)
-        validator_tts = GroqTTS(settings.groq)
-        validator_tts.use_validator_voice()
+        researcher_tts: AudioService = GroqTTS(settings.groq)  # type: ignore[assignment]
+        validator_tts: AudioService = GroqTTS(settings.groq)  # type: ignore[assignment]
+        validator_tts.use_validator_voice()  # type: ignore[attr-defined]
         audio_format = "wav"
         print("✓ Using Groq TTS")
     elif settings.tts_provider == "google":
         researcher_tts = GoogleTTS(settings.google_tts)
         validator_tts = GoogleTTS(settings.google_tts)
-        validator_tts.use_validator_voice()
+        validator_tts.use_validator_voice()  # type: ignore[attr-defined]
         audio_format = "mp3"
         print("✓ Using Google Cloud TTS")
     else:
         researcher_tts = ElevenLabsTTS(settings.elevenlabs)
         validator_tts = ElevenLabsTTS(settings.elevenlabs)
-        validator_tts.use_validator_voice()
+        validator_tts.use_validator_voice()  # type: ignore[attr-defined]
         audio_format = "mp3"
         print("✓ Using ElevenLabs TTS")
 
@@ -199,7 +203,7 @@ async def main() -> None:
 
         # Generate thread_id
         thread_id = normalize_thread_id(selected_user, selected_topic)
-        config = {"configurable": {"thread_id": thread_id}}
+        config: RunnableConfig = {"configurable": {"thread_id": thread_id}}
 
         print(f"\nUsing thread_id: {thread_id}")
         print("This allows you to continue the conversation across multiple runs!\n")
@@ -251,7 +255,7 @@ async def main() -> None:
         researcher_data = None
         validator_data = None
 
-        async for event in graph.astream(initial_state, config=config):
+        async for event in graph.astream(initial_state, config=config):  # type: ignore[arg-type]
             if "researcher" in event:
                 researcher_data = event["researcher"]
                 print("\n🔬 Researcher says:")
@@ -287,9 +291,8 @@ async def main() -> None:
             print(f"\nTotal messages in thread: {len(validator_data.get('messages', []))}")
             print(f"\nResearch Result:\n{researcher_data.get('research_result', 'N/A')}\n")
             print(f"Validation Result:\n{validator_data.get('validation_result', 'N/A')}\n")
-            print(
-                f"Validation Status: {'✓ VALIDATED' if validator_data.get('is_validated') else '✗ NOT VALIDATED'}"
-            )
+            status = "✓ VALIDATED" if validator_data.get("is_validated") else "✗ NOT VALIDATED"
+            print(f"Validation Status: {status}")
             print(
                 f"Confidence Score: {validator_data['metadata'].get('confidence_score', 'N/A')}%\n"
             )

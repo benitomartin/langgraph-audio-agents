@@ -2,18 +2,18 @@
 
 from typing import Any
 
-from langgraph_audio_agents.prompts.validator_prompts import (
-    get_validation_system_prompt,
-    get_validation_user_prompt,
-    get_validator_audio_summary_system_prompt,
-    get_validator_audio_summary_user_prompt,
-)
 from langgraph_audio_agents.domain.interfaces.agent import Agent
 from langgraph_audio_agents.domain.interfaces.audio_service import AudioService
 from langgraph_audio_agents.domain.value_objects.agent_response import AgentResponse
 from langgraph_audio_agents.domain.value_objects.message import Message
 from langgraph_audio_agents.domain.value_objects.validation_result import ValidationResult
 from langgraph_audio_agents.infrastructure.llm.openai_client import OpenAIClient
+from langgraph_audio_agents.prompts.validator_prompts import (
+    get_validation_system_prompt,
+    get_validation_user_prompt,
+    get_validator_audio_summary_system_prompt,
+    get_validator_audio_summary_user_prompt,
+)
 
 
 class ValidatorAgent(Agent):

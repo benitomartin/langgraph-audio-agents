@@ -217,6 +217,8 @@ test_voice_conversation.py
 test_research_validation.py
 test_researcher.py
 checkpoints.db
+checkpoints.db-shm
+checkpoints.db-wal
 app/
 run_web.py
 test

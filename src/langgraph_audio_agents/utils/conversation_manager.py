@@ -70,15 +70,14 @@ def extract_validation_results_from_metadata(
     """
     validations = []
     for meta in metadata_history:
-        if "confidence_score" in meta and "agent" in meta.get("agent", ""):
-            if meta.get("agent") == "validator":
-                validations.append(
-                    {
-                        "confidence_score": meta.get("confidence_score"),
-                        "assessment": meta.get("assessment", ""),
-                        "is_validated": meta.get("is_validated", False),
-                    }
-                )
+        if "confidence_score" in meta and "agent" in meta and meta.get("agent") == "validator":
+            validations.append(
+                {
+                    "confidence_score": meta.get("confidence_score"),
+                    "assessment": meta.get("assessment", ""),
+                    "is_validated": meta.get("is_validated", False),
+                }
+            )
 
     # Return last 2 validation results (most recent)
     return validations[-2:] if len(validations) >= 2 else validations
@@ -108,10 +107,7 @@ def should_summarize(
 
     # Check token count
     token_count = estimate_message_tokens(messages)
-    if token_count > max_tokens:
-        return True
-
-    return False
+    return token_count > max_tokens
 
 
 def get_recent_exchanges(messages: list[Message], num_exchanges: int = 5) -> list[Message]:

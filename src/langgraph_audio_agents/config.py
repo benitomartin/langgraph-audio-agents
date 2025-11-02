@@ -58,6 +58,38 @@ class GroqSettings(BaseModel):
 
 
 # -----------------------------
+# Google Cloud TTS settings
+# -----------------------------
+class GoogleTTSSettings(BaseModel):
+    """Google Cloud text-to-speech configuration."""
+
+    credentials_path: str = Field(
+        default="",
+        description="Path to Google Cloud credentials JSON file",
+    )
+    researcher_voice_id: str = Field(
+        default="en-US-Chirp3-HD-Aoede",
+        description="Voice ID for researcher agent (Aoede - female)",
+    )
+    validator_voice_id: str = Field(
+        default="en-US-Chirp3-HD-Alnilam",
+        description="Voice ID for validator agent (Alnilam - male)",
+    )
+    model_id: str = Field(
+        default="Chirp3-HD",
+        description="Google TTS model ID",
+    )
+    language_code: str = Field(
+        default="en-US",
+        description="Language code for TTS",
+    )
+    output_format: str = Field(
+        default="wav",
+        description="Audio output format",
+    )
+
+
+# -----------------------------
 # OpenAI settings
 # -----------------------------
 class OpenAISettings(BaseModel):
@@ -82,38 +114,6 @@ class OpenAISettings(BaseModel):
 
 
 # -----------------------------
-# Google Cloud TTS settings
-# -----------------------------
-class GoogleTTSSettings(BaseModel):
-    """Google Cloud text-to-speech configuration."""
-
-    credentials_path: str = Field(
-        default="",
-        description="Path to Google Cloud credentials JSON file",
-    )
-    researcher_voice_id: str = Field(
-        default="en-US-Chirp3-HD-Aoede",
-        description="Voice ID for researcher agent (Aoede - female)",
-    )
-    validator_voice_id: str = Field(
-        default="en-US-Chirp3-HD-Perseus",
-        description="Voice ID for validator agent (Perseus - male)",
-    )
-    model_id: str = Field(
-        default="Chirp3-HD",
-        description="Google TTS model ID",
-    )
-    language_code: str = Field(
-        default="en-US",
-        description="Language code for TTS",
-    )
-    output_format: str = Field(
-        default="wav",
-        description="Audio output format",
-    )
-
-
-# -----------------------------
 # Tavily search settings
 # -----------------------------
 class TavilySettings(BaseModel):
@@ -134,7 +134,7 @@ class Settings(BaseSettings):
     """Main application settings."""
 
     tts_provider: str = Field(
-        default="elevenlabs",
+        default="google",
         description="TTS provider to use: 'elevenlabs', 'groq', or 'google'",
     )
     elevenlabs: ElevenLabsSettings = Field(

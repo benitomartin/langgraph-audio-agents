@@ -1,11 +1,5 @@
 """Researcher agent implementation."""
 
-from langgraph_audio_agents.prompts.researcher_prompts import (
-    get_audio_summary_system_prompt,
-    get_audio_summary_user_prompt,
-    get_synthesis_system_prompt,
-    get_synthesis_user_prompt,
-)
 from langgraph_audio_agents.domain.interfaces.agent import Agent
 from langgraph_audio_agents.domain.interfaces.audio_service import AudioService
 from langgraph_audio_agents.domain.interfaces.search_service import SearchService
@@ -15,6 +9,12 @@ from langgraph_audio_agents.domain.value_objects.research_synthesis import (
     ResearchSynthesis,
 )
 from langgraph_audio_agents.infrastructure.llm.openai_client import OpenAIClient
+from langgraph_audio_agents.prompts.researcher_prompts import (
+    get_audio_summary_system_prompt,
+    get_audio_summary_user_prompt,
+    get_synthesis_system_prompt,
+    get_synthesis_user_prompt,
+)
 
 
 class ResearcherAgent(Agent):

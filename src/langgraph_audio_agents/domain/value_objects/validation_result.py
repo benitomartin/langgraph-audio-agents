@@ -10,6 +10,9 @@ class ValidationResult(BaseModel):
         ...,
         ge=0,
         le=100,
-        description="Confidence score from 0-100 where 0-40 is poor quality, 41-70 is acceptable, 71-85 is good, and 86-100 is excellent",
+        description=(
+            "Confidence score from 0-100 where 0-40 is poor quality, "
+            "41-70 is acceptable, 71-85 is good, and 86-100 is excellent"
+        ),
     )
     assessment: str = Field(..., description="Detailed assessment explaining the confidence score")

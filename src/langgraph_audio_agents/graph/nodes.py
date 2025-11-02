@@ -62,9 +62,8 @@ async def validator_node(
                 ]
 
     # Debug logging - show what's in state.metadata
-    print(
-        f"\n[DEBUG] State metadata keys: {list(state.metadata.keys()) if state.metadata else 'None'}"
-    )
+    metadata_keys = list(state.metadata.keys()) if state.metadata else "None"
+    print(f"\n[DEBUG] State metadata keys: {metadata_keys}")
     if validation_history:
         print(f"[DEBUG] Validation history found: {len(validation_history)} previous validation(s)")
         for i, val in enumerate(validation_history, 1):
@@ -75,12 +74,10 @@ async def validator_node(
         if state.metadata:
             print(f"[DEBUG] Available metadata keys: {list(state.metadata.keys())}")
             if "confidence_score" in state.metadata:
-                print(
-                    f"[DEBUG] Found confidence_score in metadata: {state.metadata.get('confidence_score')}"
-                )
-                print(
-                    f"[DEBUG] Found assessment in metadata: {state.metadata.get('assessment', '')[:100]}..."
-                )
+                score = state.metadata.get("confidence_score")
+                print(f"[DEBUG] Found confidence_score in metadata: {score}")
+                assessment_preview = state.metadata.get("assessment", "")[:100]
+                print(f"[DEBUG] Found assessment in metadata: {assessment_preview}...")
 
     response = await validator_agent.process(
         state.messages, previous_validations=validation_history if validation_history else None

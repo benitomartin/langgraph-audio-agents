@@ -56,7 +56,8 @@ class OpenAIClient:
             user_prompt: User query/context
             text_format: Pydantic model class for structured output
             model: Model to use (defaults to settings.model)
-            max_output_tokens: Maximum tokens for completion (defaults to 2000 for structured outputs)
+            max_output_tokens: Maximum tokens for completion
+                (defaults to 2000 for structured outputs)
 
         Returns:
             Parsed structured output as Pydantic model instance
@@ -75,4 +76,6 @@ class OpenAIClient:
             max_output_tokens=output_tokens,
         )
 
+        if response.output_parsed is None:
+            raise ValueError("Failed to parse structured response from OpenAI")
         return response.output_parsed

@@ -1,6 +1,5 @@
 """Groq Text-to-Speech implementation."""
 
-from enum import Enum
 from typing import Literal, cast
 
 from groq import Groq
@@ -8,13 +7,6 @@ from groq import Groq
 from langgraph_audio_agents.config import GroqSettings
 from langgraph_audio_agents.domain.interfaces.audio_service import AudioService
 from langgraph_audio_agents.domain.value_objects.tts_request import TTSRequest
-
-
-class GroqVoiceType(str, Enum):
-    """Available voice types for Groq TTS agents."""
-
-    ARISTA_FEMALE = "Arista-PlayAI"
-    FRITZ_MALE = "Fritz-PlayAI"
 
 
 class GroqTTS(AudioService):
@@ -59,36 +51,6 @@ class GroqTTS(AudioService):
         )
 
         return response.read()
-
-    # async def synthesize_with_response(self, text: str) -> TTSResponse:
-    #     """Convert text to audio and return full response model.
-
-    #     Args:
-    #         text: Text to convert to speech
-
-    #     Returns:
-    #         TTSResponse with audio data and metadata
-    #     """
-    #     audio_data = await self.synthesize(text)
-
-    #     return TTSResponse(
-    #         audio_data=audio_data,
-    #         format=self.settings.output_format,
-    #         voice_id=self.voice_id,
-    #         duration=None,
-    #     )
-
-    # def set_voice(self, voice_id: str | GroqVoiceType) -> None:
-    #     """Change the voice for this TTS instance.
-
-    #     Args:
-    #         voice_id: Voice ID to use (can be GroqVoiceType enum or string)
-    #     """
-    #     self.voice_id = voice_id if isinstance(voice_id, str) else voice_id.value
-
-    # def use_researcher_voice(self) -> None:
-    #     """Switch to researcher voice from settings."""
-    #     self.voice_id = self.settings.researcher_voice_id
 
     def use_validator_voice(self) -> None:
         """Switch to validator voice from settings."""

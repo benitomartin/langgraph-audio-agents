@@ -1,20 +1,10 @@
 """Google Cloud Text-to-Speech implementation."""
 
-from enum import Enum
-
 from google.cloud import texttospeech as tts
 
 from langgraph_audio_agents.config import GoogleTTSSettings
 from langgraph_audio_agents.domain.interfaces.audio_service import AudioService
 from langgraph_audio_agents.domain.value_objects.tts_request import TTSRequest
-from langgraph_audio_agents.domain.value_objects.tts_response import TTSResponse
-
-
-class GoogleVoiceType(str, Enum):
-    """Available voice types for Google TTS agents."""
-
-    AOEDE_FEMALE = "en-US-Chirp3-HD-Aoede"
-    PERSEUS_MALE = "en-US-Chirp3-HD-Perseus"
 
 
 class GoogleTTS(AudioService):
@@ -70,36 +60,6 @@ class GoogleTTS(AudioService):
         )
 
         return response.audio_content
-
-    async def synthesize_with_response(self, text: str) -> TTSResponse:
-        """Convert text to audio and return full response model.
-
-        Args:
-            text: Text to convert to speech
-
-        Returns:
-            TTSResponse with audio data and metadata
-        """
-        audio_data = await self.synthesize(text)
-
-        return TTSResponse(
-            audio_data=audio_data,
-            format=self.settings.output_format,
-            voice_id=self.voice_id,
-            duration=None,
-        )
-
-    def set_voice(self, voice_id: str | GoogleVoiceType) -> None:
-        """Change the voice for this TTS instance.
-
-        Args:
-            voice_id: Voice ID to use (can be GoogleVoiceType enum or string)
-        """
-        self.voice_id = voice_id if isinstance(voice_id, str) else voice_id.value
-
-    def use_researcher_voice(self) -> None:
-        """Switch to researcher voice from settings."""
-        self.voice_id = self.settings.researcher_voice_id
 
     def use_validator_voice(self) -> None:
         """Switch to validator voice from settings."""

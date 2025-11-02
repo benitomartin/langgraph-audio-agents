@@ -1,14 +1,14 @@
 """Context manager for conversation summarization and context building."""
 
-from langgraph_audio_agents.application.services.conversation_summarizer import (
-    summarize_conversation,
-)
 from langgraph_audio_agents.domain.value_objects.message import Message
 from langgraph_audio_agents.infrastructure.llm.openai_client import OpenAIClient
 from langgraph_audio_agents.utils.conversation_manager import (
     get_messages_to_summarize,
     get_recent_exchanges,
     should_summarize,
+)
+from langgraph_audio_agents.utils.conversation_summarizer import (
+    summarize_conversation,
 )
 
 

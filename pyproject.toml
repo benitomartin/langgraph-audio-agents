@@ -13,6 +13,7 @@ dependencies = [
     "elevenlabs>=2.21.0",
     "fastapi>=0.120.3",
     "google-cloud-texttospeech>=2.33.0",
+    "gradio>=5.0.0",
     "groq>=0.33.0",
     "langgraph>=1.0.1",
     "langgraph-checkpoint-sqlite>=3.0.0",
