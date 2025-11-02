@@ -11,6 +11,15 @@ include .env
 .PHONY: tests mypy clean help ruff-check ruff-check-fix ruff-format ruff-format-fix all-check all-fix
 
 #################################################################################
+## Run the voice conversation
+#################################################################################
+
+run-voice-conversation: ## Run the voice conversation
+	@echo "Running the voice conversation..."		
+	uv run src/langgraph_audio_agents/cli/conversation.py
+	@echo "Voice conversation completed."
+
+#################################################################################
 ## Testing
 #################################################################################
 

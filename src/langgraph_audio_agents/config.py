@@ -1,94 +1,175 @@
-# import os
-# from typing import ClassVar
+"""Application configuration using pydantic-settings."""
 
-# import yaml
-# from pydantic import BaseModel, Field, SecretStr, model_validator
-# from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing import ClassVar, Literal
 
-# # -----------------------------
-# # Supabase settings
-# # -----------------------------
-# class FirstInfraSettings(BaseModel):
-#     url: str = Field(default="", description="Supabase project URL")
-#     key: SecretStr = Field(default=SecretStr(""), description="Supabase project API key")
-#     table_name: str = Field(default="substack_articles", description="Supabase table name")
+from pydantic import BaseModel, Field, SecretStr
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-# # -----------------------------
-# # Supabase database settings
-# # -----------------------------
-# class SecondInfraSettings(BaseModel):
-#     host: str = Field(default="localhost", description="Database host")
-#     name: str = Field(default="postgres", description="Database name")
-#     user: str = Field(default="postgres", description="Database user")
-#     password: SecretStr = Field(default=SecretStr("password"), description="Database password")
-#     port: int = Field(default=6543, description="Database port")
-#     test_database: str = Field(default="substack_test", description="Test database name")
+# -----------------------------
+# ElevenLabs TTS settings
+# -----------------------------
+class ElevenLabsSettings(BaseModel):
+    """ElevenLabs text-to-speech configuration."""
 
-# # # -----------------------------
-# # # YAML loader
-# # # -----------------------------
-# # def load_yaml_feeds(path: str) -> list[FeedItem]:
-# #     """
-# #     Load RSS feed items from a YAML file.
-# #     If the file does not exist or is empty, returns an empty list.
-
-# #     Args:
-# #         path (str): Path to the YAML file.
-
-# #     Returns:
-# #         list[FeedItem]: List of FeedItem instances loaded from the file.
-# #     """
-# #     if not os.path.exists(path):
-# #         return []
-# #     with open(path, encoding="utf-8") as f:
-# #         data = yaml.safe_load(f)
-# #     feed_list = data.get("feeds", [])
-# #     return [FeedItem(**feed) for feed in feed_list]
+    api_key: SecretStr = Field(default=SecretStr(""), description="ElevenLabs API key")
+    researcher_voice_id: str = Field(
+        default="uYXf8XasLslADfZ2MB4u",
+        description="Voice ID for researcher agent (Hope - female)",
+    )
+    validator_voice_id: str = Field(
+        default="jRAAK67SEFE9m7ci5DhD",
+        description="Voice ID for validator agent (Ollie - male)",
+    )
+    model_id: str = Field(
+        default="eleven_flash_v2_5",  # "eleven_multilingual_v2",
+        description="""ElevenLabs model ID: eleven_flash_v2_5 (faster and cheaper), 
+                        eleven_multilingual_v2 (mode extensive, slower)""",
+    )
+    output_format: str = Field(
+        default="mp3_44100_128",
+        description="Audio output format",
+    )
 
 
-# # -----------------------------
-# # Main Settings
-# # -----------------------------
-# class Settings(BaseSettings):
-#     firstinfra: FirstInfraSettings = Field(
-#         default_factory=FirstInfraSettings
-#     )
-#     secondinfra: SecondInfraSettings = Field(
-#         default_factory=SecondInfraSettings
-#     )
+# -----------------------------
+# Groq TTS settings
+# -----------------------------
+class GroqSettings(BaseModel):
+    """Groq text-to-speech configuration."""
 
-#     # config_yaml_path: str = "src/configs/feeds.yaml"
-
-#     # Pydantic v2 model config
-#     model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
-#         env_file=[".env"],
-#         env_file_encoding="utf-8",
-#         extra="ignore",
-#         env_nested_delimiter="__",
-#         case_sensitive=False,
-#         frozen=True,
-#     )
-
-#     # @model_validator(mode="after")
-#     # def load_yaml_feeds(self) -> "Settings":
-#     #     """
-#     #     Load RSS feeds from a YAML file after model initialization.
-#     #     If the file does not exist or is empty, the feeds list remains unchanged.
-
-#     #     Args:
-#     #         self (Settings): The settings instance.
-
-#     #     Returns:
-#     #         Settings: The updated settings instance.
-#     #     """
-#     #     yaml_feeds = load_yaml_feeds(self.config_yaml_path)
-#     #     if yaml_feeds:
-#     #         self.rss.feeds = yaml_feeds
-#     #     return self
+    api_key: SecretStr = Field(default=SecretStr(""), description="Groq API key")
+    researcher_voice_id: str = Field(
+        default="Arista-PlayAI",
+        description="Voice ID for researcher agent (Arista - female)",
+    )
+    validator_voice_id: str = Field(
+        default="Fritz-PlayAI",
+        description="Voice ID for validator agent (Fritz - male)",
+    )
+    model_id: str = Field(
+        default="playai-tts",
+        description="Groq TTS model ID",
+    )
+    output_format: Literal["mp3", "wav"] = Field(
+        default="mp3",
+        description="Audio output format",
+    )
 
 
-# # -----------------------------
-# # Instantiate settings
-# # -----------------------------
-# settings = Settings()
+# -----------------------------
+# OpenAI settings
+# -----------------------------
+class OpenAISettings(BaseModel):
+    """OpenAI LLM configuration."""
+
+    api_key: SecretStr = Field(default=SecretStr(""), description="OpenAI API key")
+    model: str = Field(
+        default="gpt-4o-mini",
+        description="OpenAI model to use",
+    )
+    temperature: float = Field(
+        default=0.7,
+        description="Temperature for text generation",
+        ge=0.0,
+        le=2.0,
+    )
+    max_output_tokens: int = Field(
+        default=100,
+        description="Maximum tokens for completion",
+        gt=0,
+    )
+
+
+# -----------------------------
+# Google Cloud TTS settings
+# -----------------------------
+class GoogleTTSSettings(BaseModel):
+    """Google Cloud text-to-speech configuration."""
+
+    credentials_path: str = Field(
+        default="",
+        description="Path to Google Cloud credentials JSON file",
+    )
+    researcher_voice_id: str = Field(
+        default="en-US-Chirp3-HD-Aoede",
+        description="Voice ID for researcher agent (Aoede - female)",
+    )
+    validator_voice_id: str = Field(
+        default="en-US-Chirp3-HD-Perseus",
+        description="Voice ID for validator agent (Perseus - male)",
+    )
+    model_id: str = Field(
+        default="Chirp3-HD",
+        description="Google TTS model ID",
+    )
+    language_code: str = Field(
+        default="en-US",
+        description="Language code for TTS",
+    )
+    output_format: str = Field(
+        default="wav",
+        description="Audio output format",
+    )
+
+
+# -----------------------------
+# Tavily search settings
+# -----------------------------
+class TavilySettings(BaseModel):
+    """Tavily web search configuration."""
+
+    api_key: SecretStr = Field(default=SecretStr(""), description="Tavily API key")
+    max_results: int = Field(default=5, description="Maximum number of search results", ge=1, le=20)
+    search_depth: str = Field(
+        default="advanced",
+        description="Search depth: basic (1 API call) or advanced (2 API calls)",
+    )
+
+
+# -----------------------------
+# Main Settings
+# -----------------------------
+class Settings(BaseSettings):
+    """Main application settings."""
+
+    tts_provider: str = Field(
+        default="elevenlabs",
+        description="TTS provider to use: 'elevenlabs', 'groq', or 'google'",
+    )
+    elevenlabs: ElevenLabsSettings = Field(
+        default_factory=ElevenLabsSettings,
+        description="ElevenLabs TTS configuration",
+    )
+    groq: GroqSettings = Field(
+        default_factory=GroqSettings,
+        description="Groq TTS configuration",
+    )
+    google_tts: GoogleTTSSettings = Field(
+        default_factory=GoogleTTSSettings,
+        description="Google Cloud TTS configuration",
+    )
+    openai: OpenAISettings = Field(
+        default_factory=OpenAISettings,
+        description="OpenAI LLM configuration",
+    )
+    tavily: TavilySettings = Field(
+        default_factory=TavilySettings,
+        description="Tavily search configuration",
+    )
+
+    # Pydantic v2 model config
+    model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
+        env_file=[".env"],
+        env_file_encoding="utf-8",
+        extra="ignore",
+        env_nested_delimiter="__",
+        case_sensitive=False,
+        frozen=True,
+    )
+
+
+# -----------------------------
+# Instantiate settings
+# -----------------------------
+settings = Settings()
