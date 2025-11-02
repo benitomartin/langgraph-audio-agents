@@ -14,7 +14,7 @@ include .env
 ## Gradio App
 #################################################################################
 
-gradio-app
+gradio-app:
 	@echo "Running the Gradio app..."
 	uv run gradio_app.py
 	@echo "Gradio app completed."
@@ -23,7 +23,7 @@ gradio-app
 ## Run the voice conversation
 #################################################################################
 
-run-voice-conversation: ## Run the voice conversation
+voice-conversation: ## Run the voice conversation
 	@echo "Running the voice conversation..."		
 	uv run src/langgraph_audio_agents/cli/conversation.py
 	@echo "Voice conversation completed."

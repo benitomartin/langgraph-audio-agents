@@ -7,11 +7,16 @@
 <!-- Project Status -->
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python version](https://img.shields.io/badge/python-3.12.8-blue.svg)](https://www.python.org/downloads/)
+[![Python version](https://img.shields.io/badge/python-3.13.9-blue.svg)](https://www.python.org/downloads/)
 [![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
 
 <!-- Providers -->
 
+[![Gradio](https://img.shields.io/badge/Gradio-5.23.1-FF4B4B?logo=gradio&logoColor=white)](https://gradio.app/)
+[![Langchain](https://img.shields.io/badge/LangChain-1.0.1-green?logo=langchain&logoColor=white)](https://langchain.com/)
+[![ElevenLabs](https://img.shields.io/badge/ElevenLabs-2.21.0-purple?logo=elevenlabs&logoColor=white)](https://elevenlabs.io/)
+[![OpenAI](https://img.shields.io/badge/OpenAI-2.6.1-black?logo=openai&logoColor=white)](https://openai.com/)
+[![Google Cloud TTS](https://img.shields.io/badge/Google%20Cloud%20TTS-2.33.0-blue?logo=googlecloud&logoColor=white)](https://cloud.google.com/text-to-speech)
 
 </div>
 
@@ -24,85 +29,113 @@
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
   - [Usage](#usage)
-    - [Configuration](#configuration)
-    - [Module 1](#module-1)
-    - [Module 2](#module-2)
+    - [CLI Interface](#cli-interface)
+    - [Web Interface (Gradio)](#web-interface-gradio)
     - [Testing](#testing)
     - [Quality Checks](#quality-checks)
   - [License](#license)
 
 ## Overview
 
-langgraph-audio-agents is a Python project designed to [briefly describe purpose].  
-It provides [key features] and is built with maintainability and scalability in mind.
+langgraph-audio-agents is a conversational AI system that combines research and validation agents with text-to-speech capabilities. Built with LangGraph, it enables multi-turn conversations where a researcher agent gathers information and a validator agent assesses the quality and accuracy of responses. All conversations are persisted using SQLite checkpoints, allowing users to resume discussions across sessions.
 
 ## Project Structure
 
 ```text
-├── .github
-├── src
-├── tests
-├── LICENSE
-├── Makefile
-├── pyproject.toml
-├── README.md
-├── uv.lock
+├── src/langgraph_audio_agents/
+│   ├── agents/              # Researcher and validator agents
+│   ├── cli/                 # Command-line interface
+│   ├── domain/              # Domain entities and interfaces
+│   ├── graph/               # LangGraph workflow definitions
+│   ├── infrastructure/      # TTS, LLM, and search implementations
+│   └── utils/               # Utility functions
+├── gradio_app.py            # Web interface for conversations
+├── pyproject.toml           # Project dependencies and configuration
+└── Makefile                 # Development commands
 ```
 
 ## Prerequisites
 
-- Python 3.12
-- XXX
+- Python 3.13+
+- uv package manager
+- API keys for:
+  - OpenAI (for LLM)
+  - Tavily (for web search)
+  - TTS provider (ElevenLabs, Groq, or Google Cloud)
 
 ## Installation
 
 1. Clone the repository:
 
    ```bash
-   git clone git@github.com:benitomartin/.git
-   cd 
+   git clone git@github.com:benitomartin/langgraph-audio-agents.git
+   cd langgraph-audio-agents
    ```
 
-2. Create a virtual environment:
+2. Create and activate a virtual environment:
 
    ```bash
    uv venv
+   source .venv/bin/activate
    ```
 
-3. Activate the virtual environment:
-
-     ```bash
-     source .venv/bin/activate
-     ```
-
-4. Install the required packages:
+3. Install dependencies:
 
    ```bash
-   uv sync --all-groups --all-extra
+   uv sync --all-groups
    ```
 
-5. Create a `.env` file in the root directory:
+4. Configure environment variables:
 
    ```bash
-    cp env.example .env
+   cp .env.example .env
+   ```
+
+   Edit `.env` and add your API keys:
+
+   ```env
+   TAVILY__API_KEY=your_tavily_key
+   ELEVENLABS__API_KEY=your_elevenlabs_key
+   GROQ__API_KEY=your_groq_key
+   OPENAI__API_KEY=your_openai_key
+   TTS_PROVIDER=google  # or elevenlabs, groq
+   GOOGLE_TTS__CREDENTIALS_PATH=/path/to/.config/gcloud/application_default_credentials.json
    ```
 
 ## Usage
 
-### Configuration
+### CLI Interface
 
-Configure API keys, model names, and other settings by editing:
+Run the interactive command-line interface:
 
-src/configs/settings.py
-src/configs/config.yaml
+```bash
+make voice-conversation
+```
 
-### Module 1
+Features:
 
-(Add description or usage example)
+- Select or create users and topics
+- Load previous conversation history
+- Ask questions and receive validated research
+- Audio playback of agent responses (requires mpv or ffplay)
 
-### Module 2
+### Web Interface (Gradio)
 
-(Add description or usage example)
+Launch the web interface:
+
+```bash
+make gradio-app
+```
+
+Open your browser to `http://localhost:7860`
+
+Features:
+
+- Web-based conversation interface
+- User and topic management with dropdowns
+- Sequential automatic audio playback (researcher first, then validator)
+- Conversation history loading
+- Autoplay responses
 
 ### Testing
 

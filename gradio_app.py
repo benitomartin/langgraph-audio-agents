@@ -2,11 +2,13 @@
 
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
+from io import BytesIO
 from pathlib import Path
 
 import gradio as gr
 from langchain_core.runnables import RunnableConfig
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
+from tinytag import TinyTag
 
 from src.langgraph_audio_agents.agents.researcher import ResearcherAgent
 from src.langgraph_audio_agents.agents.validator import ValidatorAgent
@@ -52,7 +54,7 @@ class ConversationApp:
         self.checkpointer = None
         self.checkpointer_context = None
         self.db_path = Path(settings.checkpoint_db_path)
-        self.audio_format = "wav"
+        self.audio_format = "mp3"
         self.researcher = None
         self.validator = None
         self.initialized = False
@@ -215,15 +217,19 @@ class ConversationApp:
         validator_audio_path = None
         researcher_text = ""
         validator_text = ""
+        researcher_audio_data = None
+        researcher_duration = 0.0
 
         async for event in self.graph.astream(initial_state, config=config):  # type: ignore[arg-type]
             if "researcher" in event:
                 researcher_data = event["researcher"]
                 researcher_text = researcher_data["messages"][-1].content
                 if researcher_data.get("audio_data"):
+                    researcher_audio_data = researcher_data["audio_data"]
                     researcher_audio_path = self._save_temp_audio(
-                        researcher_data["audio_data"], "researcher"
+                        researcher_audio_data, "researcher"
                     )
+                    researcher_duration = self._get_audio_duration(researcher_audio_data)
                     partial_response = (
                         f"**Researcher:**\n{researcher_text}\n\n**Validator:**\n_Processing..._"
                     )
@@ -252,6 +258,9 @@ class ConversationApp:
         response = f"**Researcher:**\n{researcher_text}\n\n**Validator:**\n{validator_text}"
         history[-1][1] = response
 
+        if researcher_duration > 0:
+            await asyncio.sleep(researcher_duration)
+
         yield (
             history,
             researcher_audio_path,
@@ -259,6 +268,16 @@ class ConversationApp:
             "",
             f"Conversation saved with thread_id: {thread_id}",
         )
+
+    def _get_audio_duration(self, audio_data: bytes) -> float:
+        """Get duration of audio in seconds using tinytag."""
+        try:
+            tag = TinyTag.get(file_obj=BytesIO(audio_data))
+            duration = tag.duration if tag.duration else 0.0
+            return duration + 10.0
+        except Exception as e:
+            print(f"Error getting audio duration: {e}")
+            return 10.0
 
     def _save_temp_audio(self, audio_data: bytes, prefix: str) -> str:
         """Save audio data to temporary file and return path."""
@@ -375,7 +394,7 @@ with gr.Blocks(title="Research & Validation Conversation") as demo:
 
     with gr.Row():
         researcher_audio = gr.Audio(label="Researcher Audio", autoplay=True)
-        validator_audio = gr.Audio(label="Validator Audio", autoplay=False)
+        validator_audio = gr.Audio(label="Validator Audio", autoplay=True)
 
     thread_info = gr.Textbox(label="Thread Info", interactive=False)
 
