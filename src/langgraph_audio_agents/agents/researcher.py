@@ -1,6 +1,6 @@
 """Researcher agent implementation."""
 
-from langgraph_audio_agents.application.prompts.researcher_prompts import (
+from langgraph_audio_agents.prompts.researcher_prompts import (
     get_audio_summary_system_prompt,
     get_audio_summary_user_prompt,
     get_synthesis_system_prompt,

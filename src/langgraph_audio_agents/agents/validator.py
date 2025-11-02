@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from langgraph_audio_agents.application.prompts.validator_prompts import (
+from langgraph_audio_agents.prompts.validator_prompts import (
     get_validation_system_prompt,
     get_validation_user_prompt,
     get_validator_audio_summary_system_prompt,
