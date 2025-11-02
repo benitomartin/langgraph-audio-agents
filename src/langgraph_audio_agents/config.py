@@ -23,7 +23,7 @@ class ElevenLabsSettings(BaseModel):
     )
     model_id: str = Field(
         default="eleven_flash_v2_5",  # "eleven_multilingual_v2",
-        description="""ElevenLabs model ID: eleven_flash_v2_5 (faster and cheaper), 
+        description="""ElevenLabs model ID: eleven_flash_v2_5 (faster and cheaper),
                         eleven_multilingual_v2 (mode extensive, slower)""",
     )
     output_format: str = Field(

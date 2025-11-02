@@ -146,7 +146,7 @@ class ResearcherAgent(Agent):
         """
         if not self.llm_client:
             # Fallback: simple conversational summary
-            return f"""Based on my research about {query}, 
+            return f"""Based on my research about {query},
             here's what I found: {detailed_content[:200]}..."""
 
         system_prompt = get_audio_summary_system_prompt()

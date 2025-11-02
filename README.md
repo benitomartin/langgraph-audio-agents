@@ -37,7 +37,7 @@
 
 ## Overview
 
-langgraph-audio-agents is a conversational AI system that combines research and validation agents with text-to-speech capabilities. Built with LangGraph, it enables multi-turn conversations where a researcher agent gathers information and a validator agent assesses the quality and accuracy of responses. All conversations are persisted using SQLite checkpoints, allowing users to resume discussions across sessions.
+LangGraph Audio Agents is a conversational AI system that combines research and validation agents with text-to-speech capabilities. Built with LangGraph, it enables multi-turn conversations where a researcher agent gathers information and a validator agent assesses the quality and accuracy of responses. All conversations are persisted using SQLite checkpoints, allowing users to resume discussions across sessions.
 
 ## Project Structure
 
@@ -72,20 +72,20 @@ langgraph-audio-agents is a conversational AI system that combines research and 
    cd langgraph-audio-agents
    ```
 
-2. Create and activate a virtual environment:
+1. Create and activate a virtual environment:
 
    ```bash
    uv venv
    source .venv/bin/activate
    ```
 
-3. Install dependencies:
+1. Install dependencies:
 
    ```bash
    uv sync --all-groups
    ```
 
-4. Configure environment variables:
+1. Configure environment variables:
 
    ```bash
    cp .env.example .env
@@ -157,9 +157,9 @@ Individual Commands:
 
 - Display all available commands:
 
-    ```bash
-    make help
-    ```
+  ```bash
+  make help
+  ```
 
 - Check code formatting and linting:
 
@@ -175,10 +175,10 @@ Individual Commands:
 
 - Clean cache and build files:
 
-    ```bash
-    make clean
-    ```
+  ```bash
+  make clean
+  ```
 
 ## License
 
-This project is licensed under the  - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the - see the [LICENSE](LICENSE) file for details.

@@ -24,7 +24,7 @@ gradio-app:
 #################################################################################
 
 voice-conversation: ## Run the voice conversation
-	@echo "Running the voice conversation..."		
+	@echo "Running the voice conversation..."
 	uv run src/langgraph_audio_agents/cli/conversation.py
 	@echo "Voice conversation completed."
 
@@ -59,7 +59,7 @@ ruff-check-fix: ## Auto-format code using Ruff
 # Formatting (just checks)
 ruff-format: ## Check code format violations (--diff to show possible changes)
 	@echo "Checking Ruff formatting..."
-	uv run ruff format . --check 
+	uv run ruff format . --check
 	@echo "Ruff format checks complete."
 
 ruff-format-fix: ## Auto-format code using Ruff

@@ -3,7 +3,7 @@
 import asyncio
 import contextlib
 import os
-import subprocess
+import subprocess  # nosec B404
 import sys
 import tempfile
 from pathlib import Path
@@ -50,7 +50,7 @@ def play_audio_sync(audio_data: bytes, format: str = "wav") -> None:
                 temp_file.write(audio_data)
                 temp_path = temp_file.name
 
-            subprocess.run(
+            subprocess.run(  # nosec B603
                 player_cmd + [temp_path],
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,

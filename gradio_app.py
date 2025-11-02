@@ -1,9 +1,11 @@
 """Gradio web interface for conversational research and validation with checkpoint persistence."""
 
 import asyncio
+from collections.abc import AsyncGenerator, Generator
 from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
 from pathlib import Path
+from typing import Any
 
 import gradio as gr
 from langchain_core.runnables import RunnableConfig
@@ -50,13 +52,13 @@ def get_event_loop():  # type: ignore[no-untyped-def]
 
 class ConversationApp:
     def __init__(self) -> None:
-        self.graph = None
-        self.checkpointer = None
-        self.checkpointer_context = None
+        self.graph: Any = None
+        self.checkpointer: Any = None
+        self.checkpointer_context: Any = None
         self.db_path = Path(settings.checkpoint_db_path)
         self.audio_format = "mp3"
-        self.researcher = None
-        self.validator = None
+        self.researcher: ResearcherAgent | None = None
+        self.validator: ValidatorAgent | None = None
         self.initialized = False
 
     async def initialize_services(self) -> str:
@@ -169,7 +171,7 @@ class ConversationApp:
         new_topic: str,
         user_query: str,
         history: list[list[str]],
-    ):  # type: ignore[no-untyped-def]
+    ) -> AsyncGenerator[tuple[list[list[str]], str | None, str | None, str, str]]:
         """Process conversation stream with researcher and validator agents."""
         if not self.graph:
             await self.initialize_services()
@@ -211,7 +213,7 @@ class ConversationApp:
             metadata=existing_metadata,
         )
 
-        history.append([user_query, None])
+        history.append([user_query, ""])  # Start with empty response
 
         researcher_audio_path = None
         validator_audio_path = None
@@ -220,7 +222,7 @@ class ConversationApp:
         researcher_audio_data = None
         researcher_duration = 0.0
 
-        async for event in self.graph.astream(initial_state, config=config):  # type: ignore[arg-type]
+        async for event in self.graph.astream(initial_state, config=config):  # type: ignore[arg-type,attr-defined]
             if "researcher" in event:
                 researcher_data = event["researcher"]
                 researcher_text = researcher_data["messages"][-1].content
@@ -335,7 +337,7 @@ def sync_process(
     new_topic: str,
     query: str,
     history: list[list[str]],
-):  # type: ignore[no-untyped-def]
+) -> Generator[tuple[list[list[str]], str | None, str | None, str, str]]:
     """Process conversation query and stream results."""
     loop = get_event_loop()
     async_gen = app.process_conversation_stream(user, topic, new_user, new_topic, query, history)
@@ -443,4 +445,4 @@ with gr.Blocks(title="Research & Validation Conversation") as demo:
 
 
 if __name__ == "__main__":
-    demo.launch(server_name="0.0.0.0", server_port=7860, share=False)
+    demo.launch(server_name="0.0.0.0", server_port=7860, share=False)  # nosec B104

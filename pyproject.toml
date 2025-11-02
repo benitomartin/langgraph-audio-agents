@@ -138,7 +138,7 @@ max-complexity = 10   # Maximum McCabe complexity allowed per function
 
 [tool.mypy]
 files = ["src"]                  # Check all files in src/
-mypy_path = ["src"]              # Add src to Python path so imports work correctly
+explicit_package_bases = true    # Use explicit package bases to avoid module name conflicts
 
 ignore_missing_imports = true    # Ignore third-party imports without type hints
 disallow_untyped_defs = true     # Require type annotations for all function definitions
