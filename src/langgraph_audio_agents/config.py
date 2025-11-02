@@ -137,6 +137,10 @@ class Settings(BaseSettings):
         default="google",
         description="TTS provider to use: 'elevenlabs', 'groq', or 'google'",
     )
+    checkpoint_db_path: str = Field(
+        default="checkpoints.db",
+        description="Path to checkpoint database file",
+    )
     elevenlabs: ElevenLabsSettings = Field(
         default_factory=ElevenLabsSettings,
         description="ElevenLabs TTS configuration",

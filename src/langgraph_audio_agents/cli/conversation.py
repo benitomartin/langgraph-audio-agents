@@ -117,7 +117,7 @@ async def main() -> None:
 
     print("Creating graph with async SQLite checkpointer...")
     workflow = create_research_validation_graph(researcher, validator)
-    db_path = Path("checkpoints.db")
+    db_path = Path(settings.checkpoint_db_path)
 
     async with AsyncSqliteSaver.from_conn_string(str(db_path)) as checkpointer:
         graph = workflow.compile(checkpointer=checkpointer)

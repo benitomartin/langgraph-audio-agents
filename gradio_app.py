@@ -33,6 +33,7 @@ event_loop = None
 
 
 def get_event_loop():  # type: ignore[no-untyped-def]
+    """Get or create persistent event loop for async operations."""
     global event_loop
     if event_loop is None or event_loop.is_closed():
         event_loop = asyncio.new_event_loop()
@@ -50,13 +51,14 @@ class ConversationApp:
         self.graph = None
         self.checkpointer = None
         self.checkpointer_context = None
-        self.db_path = Path("checkpoints.db")
+        self.db_path = Path(settings.checkpoint_db_path)
         self.audio_format = "wav"
         self.researcher = None
         self.validator = None
         self.initialized = False
 
     async def initialize_services(self) -> str:
+        """Initialize all services including agents, TTS, and graph."""
         if self.initialized:
             return "Services already initialized"
 
@@ -105,11 +107,13 @@ class ConversationApp:
         return f"Services initialized. {status}"
 
     async def get_users(self) -> list[str]:
+        """Get list of all users from checkpoint database."""
         thread_ids = await list_all_thread_ids(self.db_path)
         users = list_users(thread_ids)
         return ["[Create New User]"] + users
 
     async def get_topics(self, user: str) -> list[str]:
+        """Get list of topics for a specific user."""
         if user == "[Create New User]" or not user:
             return ["[Create New Topic]"]
         thread_ids = await list_all_thread_ids(self.db_path)
@@ -117,6 +121,7 @@ class ConversationApp:
         return ["[Create New Topic]"] + topics
 
     async def load_conversation_history(self, user: str, topic: str) -> list[list[str]]:
+        """Load conversation history for a user and topic."""
         if not self.graph:
             return []
 
@@ -129,15 +134,25 @@ class ConversationApp:
         try:
             previous_state = await self.graph.aget_state(config)
             if previous_state.values and previous_state.values.get("messages"):
+                messages = previous_state.values["messages"]
                 history = []
-                for msg in previous_state.values["messages"]:
+                current_user = None
+                agent_responses = []
+
+                for msg in messages:
                     if msg.role == "user":
-                        history.append([msg.content, None])
-                    elif msg.role == "assistant":
-                        if history and history[-1][1] is None:
-                            history[-1][1] = msg.content
-                        else:
-                            history.append([None, msg.content])
+                        if current_user is not None:
+                            response = "\n\n".join(agent_responses) if agent_responses else None
+                            history.append([current_user, response])
+                            agent_responses = []
+                        current_user = msg.content
+                    elif msg.role == "agent" or msg.role == "assistant":
+                        agent_responses.append(msg.content)
+
+                if current_user is not None:
+                    response = "\n\n".join(agent_responses) if agent_responses else None
+                    history.append([current_user, response])
+
                 return history
         except Exception as e:
             print(f"Error loading history: {e}")
@@ -153,6 +168,7 @@ class ConversationApp:
         user_query: str,
         history: list[list[str]],
     ):  # type: ignore[no-untyped-def]
+        """Process conversation stream with researcher and validator agents."""
         if not self.graph:
             await self.initialize_services()
 
@@ -245,16 +261,17 @@ class ConversationApp:
         )
 
     def _save_temp_audio(self, audio_data: bytes, prefix: str) -> str:
+        """Save audio data to temporary file and return path."""
         import tempfile
 
-        temp_file = tempfile.NamedTemporaryFile(
+        with tempfile.NamedTemporaryFile(
             suffix=f".{self.audio_format}", delete=False, prefix=prefix
-        )
-        temp_file.write(audio_data)
-        temp_file.close()
-        return temp_file.name
+        ) as temp_file:
+            temp_file.write(audio_data)
+            return temp_file.name
 
     async def cleanup(self) -> None:
+        """Clean up async resources."""
         if self.checkpointer_context:
             await self.checkpointer_context.__aexit__(None, None, None)
 
@@ -263,33 +280,32 @@ app = ConversationApp()
 
 
 def run_async(coro):  # type: ignore[no-untyped-def]
-    def _run():  # type: ignore[no-untyped-def]
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        try:
-            return loop.run_until_complete(coro)
-        finally:
-            loop.close()
-
-    return executor.submit(_run).result()
+    """Run async coroutine in persistent event loop."""
+    loop = get_event_loop()
+    future = asyncio.run_coroutine_threadsafe(coro, loop)
+    return future.result()
 
 
 def sync_initialize() -> tuple[str, gr.Dropdown]:
+    """Initialize services and return status with user dropdown."""
     status = run_async(app.initialize_services())
     users = run_async(app.get_users())
     return status, gr.Dropdown(choices=users, value=users[0] if users else None)
 
 
 def sync_get_users() -> list[str]:
+    """Get list of users synchronously."""
     return run_async(app.get_users())
 
 
 def sync_get_topics(user: str) -> tuple[gr.Dropdown, list[list[str]]]:
+    """Get topics for user and return dropdown with empty chat history."""
     topics = run_async(app.get_topics(user))
     return gr.Dropdown(choices=topics, value=topics[0] if topics else None), []
 
 
 def sync_load_history(user: str, topic: str) -> list[list[str]]:
+    """Load conversation history synchronously."""
     return run_async(app.load_conversation_history(user, topic))
 
 
@@ -301,6 +317,7 @@ def sync_process(
     query: str,
     history: list[list[str]],
 ):  # type: ignore[no-untyped-def]
+    """Process conversation query and stream results."""
     loop = get_event_loop()
     async_gen = app.process_conversation_stream(user, topic, new_user, new_topic, query, history)
 

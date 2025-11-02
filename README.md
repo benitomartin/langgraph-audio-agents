@@ -1,5 +1,7 @@
 # langgraph-audio-agents
 
+![Diagram](static/image.png)
+
 <div align="center">
 
 <!-- Project Status -->

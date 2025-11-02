@@ -8,7 +8,16 @@ endif
 # Load environment variables from .env
 include .env
 
-.PHONY: tests mypy clean help ruff-check ruff-check-fix ruff-format ruff-format-fix all-check all-fix
+.PHONY: mypy clean help ruff-check ruff-check-fix ruff-format ruff-format-fix all-check all-fix
+
+#################################################################################
+## Gradio App
+#################################################################################
+
+gradio-app
+	@echo "Running the Gradio app..."
+	uv run gradio_app.py
+	@echo "Gradio app completed."
 
 #################################################################################
 ## Run the voice conversation
@@ -18,15 +27,6 @@ run-voice-conversation: ## Run the voice conversation
 	@echo "Running the voice conversation..."		
 	uv run src/langgraph_audio_agents/cli/conversation.py
 	@echo "Voice conversation completed."
-
-#################################################################################
-## Testing
-#################################################################################
-
-tests: ## Run all tests
-	@echo "Running all tests..."
-	uv run pytest
-	@echo "All tests completed."
 
 ################################################################################
 ## Prek Commands

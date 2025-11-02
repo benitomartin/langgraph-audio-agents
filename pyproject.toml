@@ -25,22 +25,8 @@ dependencies = [
     "tiktoken>=0.8.0",
 ]
 
-# [[tool.uv.index]]
-# name = "pytorch-cpu"
-# url = "https://download.pytorch.org/whl/cpu"
-# explicit = true
-
-# [tool.uv.sources]
-# torch = [
-#   { index = "pytorch-cpu" },
-# ]
-# torchvision = [
-#   { index = "pytorch-cpu" },
-# ]
-
 [dependency-groups]
 dev = [
-    "langgraph-cli[inmem]>=0.4.4",
     "prek>=0.2.12",
 ]
 lint = [
@@ -48,7 +34,6 @@ lint = [
     "ruff>=0.14.2",
 ]
 test = [
-    "pytest>=8.4.2",
 ]
 
 [build-system]
@@ -161,26 +146,3 @@ warn_redundant_casts = true      # Warn about redundant casts
 warn_unused_ignores = false      # Warn about unused # type: ignore comments
 warn_return_any = false          # Warn if a function returns Any type
 strict_optional = true           # Enable strict optional checking
-
-
-# # Use `packages` to specify the package root
-# packages = ["src"]
-# explicit_package_bases = true
-
-
-#########################
-# --- Testing Tools --- #
-#########################
-
-[tool.pytest.ini_options]       
-testpaths = [ "tests" ]         # Directories where pytest will look for tests  
-python_files = [ "test_*.py" ]  # Test file patterns
-addopts = "-ra -v -s"           # Additional command-line options for pytest
-# -r a : Show extra summary info for all tests (skipped, failed, etc.)
-# -v   : Verbose output
-# -s   : Disable output capturing so you can see print() statements in real-time
-
-filterwarnings = [
-    "ignore::DeprecationWarning", # Ignore DeprecationWarnings
-    "ignore::UserWarning"         # Ignore UserWarnings 
-]
