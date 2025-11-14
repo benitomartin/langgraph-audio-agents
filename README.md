@@ -1,4 +1,4 @@
-# langgraph-audio-agents
+# LangGraph Audio Agents
 
 ![Diagram](static/image.png)
 
