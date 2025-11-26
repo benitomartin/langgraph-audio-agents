@@ -43,11 +43,13 @@ LangGraph Audio Agents is a conversational AI system that combines research and 
 
 ```text
 ├── src/langgraph_audio_agents/
+│   ├── config.py            # Settings
 │   ├── agents/              # Researcher and validator agents
 │   ├── cli/                 # Command-line interface
 │   ├── domain/              # Domain entities and interfaces
 │   ├── graph/               # LangGraph workflow definitions
 │   ├── infrastructure/      # TTS, LLM, and search implementations
+│   ├── prompts/             # Agents prompts
 │   └── utils/               # Utility functions
 ├── gradio_app.py            # Web interface for conversations
 ├── pyproject.toml           # Project dependencies and configuration
