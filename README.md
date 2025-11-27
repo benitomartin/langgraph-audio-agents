@@ -39,6 +39,9 @@
 
 LangGraph Audio Agents is a conversational AI system that combines research and validation agents with text-to-speech capabilities. Built with LangGraph, it enables multi-turn conversations where a researcher agent gathers information and a validator agent assesses the quality and accuracy of responses. All conversations are persisted using SQLite checkpoints, allowing users to resume discussions across sessions.
 
+Article: [Building Conversational Audio Agents with LangGraph and Real-Time Validation](https://aiechoes.substack.com/p/building-conversational-audio-agents)
+
+
 ## Project Structure
 
 ```text
